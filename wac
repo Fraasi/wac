@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null disable=
+#
+# script for querying wolfram-alpha api from command line
+#
 
-usage() {
+
+# if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
+if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
+  source "$HOME"/.config/wac/config
+fi
+
+function usage() {
   printf "
 Usage:
   %s [OPTIONS] <your query>
@@ -13,15 +23,17 @@ Usage:
   " "$0"
 }
 
-app_id=$WOLFRAM_APP_ID
-mode="spoken"
-base_url="https://api.wolframalpha.com/v1"
-query="$*"
+function main() {
 
-OPTIND=1    # OPTIND is not automatically reset
+  app_id=$WOLFRAM_APP_ID
+  mode="spoken"
+  base_url="https://api.wolframalpha.com/v1"
+  query="$*"
 
-while getopts "hsrw" OPTNAME; do
-  case "$OPTNAME" in
+  OPTIND=1 # OPTIND is not automatically reset
+
+  while getopts "hsrw" OPTNAME; do
+    case "$OPTNAME" in
     h)
       usage
       exit 0
@@ -43,8 +55,9 @@ while getopts "hsrw" OPTNAME; do
       usage
       exit 1
       ;;
-  esac
-done
+    esac
+  done
 
-curl --data "appid=$app_id" --data-urlencode "i=$*" "$base_url/$mode"
-
+  curl --data "appid=$app_id" --data-urlencode "i=$*" "$base_url/$mode"
+}
+main "$@"
