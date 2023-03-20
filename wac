@@ -36,25 +36,25 @@ Usage:
   -s    spoken mode (default)
   -r    result mode
   -w    query the web interface
-  " "$0"
+  " "$(basename "$0")"
 }
 
 function main() {
 
-  local app_id="$WOLFRAM_APP_ID"
   local mode="spoken"
+  local app_id="$WOLFRAM_APP_ID"
   local base_url="https://api.wolframalpha.com/v2"
-  local query="$*"
+  local debug=false
 
-  OPTIND=1 # OPTIND is not automatically reset
-
-  while getopts "fhsrw" OPTNAME; do
+  while getopts "dfhsrw" OPTNAME; do
     case "$OPTNAME" in
+    d)
+      debug=true
+      echo "d: $*"
+      ;;
     f)
-      shift
-      result=$(curl --silent --data "appid=$app_id" --data "output=json" --data-urlencode "i=$*" "$base_url/query")
-      printf "%s" "$result"
-      exit 0
+      mode="query"
+      echo "f: $*"
       ;;
     h)
       usage
@@ -62,11 +62,9 @@ function main() {
       ;;
     s)
       mode="spoken"
-      shift
       ;;
     r)
       mode="result"
-      shift
       ;;
     w)
       shift
@@ -79,8 +77,15 @@ function main() {
       ;;
     esac
   done
+  shift $((OPTIND - 1))
 
-  curl --data "appid=$app_id" --data-urlencode "i=$*" "$base_url/$mode"
+  local result
+  result=$(curl --silent --data "output=json" --data "appid=$app_id" --data-urlencode "input=$*" "$base_url/$mode")
+  if [[ "$debug" == true ]]; then
+    printf "%s" "$result" >result.json
+  else
+    printf "%s" "$result"
+  fi
 }
 
 main "$@"
