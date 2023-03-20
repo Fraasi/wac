@@ -4,10 +4,25 @@
 # script for querying wolfram-alpha api from command line
 #
 
-
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
 if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
   source "$HOME"/.config/wac/config
+fi
+
+# check for dependencies
+dependencies=('curl' 'jq')
+for dep in "${dependencies[@]}"; do
+  if ! command -v "$dep" >/dev/null 2>&1; then
+    printf "%s has a dependency of %s which was not found in path\nexiting..." "$0" "$dep"
+    exit 1
+  fi
+done
+
+# check if running in wsl for start program
+if command -v wsl.exe >/dev/null 2>&1; then
+  start="explorer.exe"
+else
+  start="xdg-open"
 fi
 
 function usage() {
@@ -16,6 +31,7 @@ Usage:
   %s [OPTIONS] <your query>
 
   Options:
+  -f    full api mode
   -h    show this help
   -s    spoken mode (default)
   -r    result mode
@@ -25,15 +41,21 @@ Usage:
 
 function main() {
 
-  app_id=$WOLFRAM_APP_ID
-  mode="spoken"
-  base_url="https://api.wolframalpha.com/v1"
-  query="$*"
+  local app_id="$WOLFRAM_APP_ID"
+  local mode="spoken"
+  local base_url="https://api.wolframalpha.com/v2"
+  local query="$*"
 
   OPTIND=1 # OPTIND is not automatically reset
 
-  while getopts "hsrw" OPTNAME; do
+  while getopts "fhsrw" OPTNAME; do
     case "$OPTNAME" in
+    f)
+      shift
+      result=$(curl --silent --data "appid=$app_id" --data "output=json" --data-urlencode "i=$*" "$base_url/query")
+      printf "%s" "$result"
+      exit 0
+      ;;
     h)
       usage
       exit 0
@@ -48,7 +70,7 @@ function main() {
       ;;
     w)
       shift
-      explorer.exe "https://www.wolframalpha.com/input?i=$*"
+      "$start" "https://www.wolframalpha.com/input?i=$*"
       exit 0
       ;;
     *)
@@ -60,4 +82,5 @@ function main() {
 
   curl --data "appid=$app_id" --data-urlencode "i=$*" "$base_url/$mode"
 }
+
 main "$@"
