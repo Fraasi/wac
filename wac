@@ -13,7 +13,7 @@ fi
 dependencies=('curl' 'jq')
 for dep in "${dependencies[@]}"; do
   if ! command -v "$dep" >/dev/null 2>&1; then
-    printf "%s has a dependency of %s which was not found in path\nexiting..." "$0" "$dep"
+    printf "%s has a dependency of %s which was not found in path\nexiting..."  "$(basename "$0")" "$dep"
     exit 1
   fi
 done
@@ -31,9 +31,10 @@ Usage:
   %s [OPTIONS] <your query>
 
   Options:
-  -f    full api mode
+  -d    debug (with -f, dump json to result.json)
+  -f    full api mode (default)
   -h    show this help
-  -s    spoken mode (default)
+  -s    spoken mode
   -r    result mode
   -w    query the web interface
   " "$(basename "$0")"
@@ -41,7 +42,7 @@ Usage:
 
 function main() {
 
-  local mode="spoken"
+  local mode="query"
   local app_id="$WOLFRAM_APP_ID"
   local base_url="https://api.wolframalpha.com/v2"
   local debug=false
@@ -50,11 +51,9 @@ function main() {
     case "$OPTNAME" in
     d)
       debug=true
-      echo "d: $*"
       ;;
     f)
       mode="query"
-      echo "f: $*"
       ;;
     h)
       usage
@@ -84,7 +83,8 @@ function main() {
   if [[ "$debug" == true ]]; then
     printf "%s" "$result" >result.json
   else
-    printf "%s" "$result"
+  #  jq --raw-output '.[] | .pods[].subpods[].plaintext' result.json
+    printf "%s" "$result" | jq --raw-output '.[] | .pods[].subpods[].plaintext'
   fi
 }
 
