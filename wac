@@ -13,7 +13,7 @@ fi
 dependencies=('curl' 'jq')
 for dep in "${dependencies[@]}"; do
   if ! command -v "$dep" >/dev/null 2>&1; then
-    printf "%s has a dependency of %s which was not found in path\nexiting..."  "$(basename "$0")" "$dep"
+    printf "%s has a dependency of %s which was not found in path\nexiting..." "$(basename "$0")" "$dep"
     exit 1
   fi
 done
@@ -79,12 +79,17 @@ function main() {
   shift $((OPTIND - 1))
 
   local result
-  result=$(curl --silent --data "output=json" --data "appid=$app_id" --data-urlencode "input=$*" "$base_url/$mode")
+  result=$(curl --silent \
+    --data "output=json" \
+    --data "appid=$app_id" \
+    --data-urlencode "input=$*" \
+    "$base_url/$mode")
+
   if [[ "$debug" == true ]]; then
     printf "%s" "$result" >result.json
   else
-  #  jq --raw-output '.[] | .pods[].subpods[].plaintext' result.json
-    printf "%s" "$result" | jq --raw-output '.[] | .pods[].subpods[].plaintext'
+    # TODO: catch jq errors if no results
+    printf "%s" "$result" | jq --raw-output ' .[].pods[] | (.title + ":", .subpods[].plaintext, "") '
   fi
 }
 
