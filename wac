@@ -4,6 +4,8 @@
 # script for querying wolfram-alpha api from command line
 #
 
+version="1.0.0"
+
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
 if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
   source "$HOME"/.config/wac/config
@@ -28,7 +30,7 @@ fi
 function usage() {
   printf "
 Usage:
-  %s [OPTIONS] <your query>
+  %s [options] <your query>
 
   Options:
   -d    debug (with -f, dump json to result.json)
@@ -36,6 +38,7 @@ Usage:
   -h    show this help
   -s    spoken mode
   -r    result mode
+  -v    show version
   -w    query the web interface
   " "$(basename "$0")"
 }
@@ -47,7 +50,7 @@ function main() {
   local base_url="https://api.wolframalpha.com/v2"
   local debug=false
 
-  while getopts "dfhsrw" OPTNAME; do
+  while getopts "dfhsrvw" OPTNAME; do
     case "$OPTNAME" in
     d)
       debug=true
@@ -65,6 +68,10 @@ function main() {
     r)
       mode="result"
       ;;
+    v)
+      printf "v%s" "$version"
+      exit 0
+      ;;
     w)
       shift
       "$start" "https://www.wolframalpha.com/input?i=$*"
@@ -81,6 +88,7 @@ function main() {
   local result
   result=$(curl --silent \
     --data "output=json" \
+    --data "reinterpret=true" \
     --data "appid=$app_id" \
     --data-urlencode "input=$*" \
     "$base_url/$mode")
