@@ -37,10 +37,32 @@ Usage:
   -f    full qyery mode (default)
   -h    show this help
   -s    spoken mode
+  -t    show tips on how to use
   -r    result mode
   -v    show version
   -w    query the web interface
   " "$(basename "$0")"
+}
+
+function tips() {
+    printf "
+Try the following:
+  Use different phrasing or notations
+  Enter whole words instead of abbreviations
+  Avoid mixing mathematical and other notations
+  Check your spelling
+  Give your input in English
+
+  Other tips for using Wolfram|Alpha
+  Wolfram|Alpha answers specific questions rather than explaining general topics
+  (e.g. Enter '2 cups of sugar', not 'nutrition information')
+  You can only get answers about objective facts
+  (e.g. Try 'highest mountain', not 'most beautiful painting')
+  Only what is known is known to Wolfram|Alpha
+  (e.g. Ask 'how many men in Mauritania', not 'how many monsters in Loch Ness')
+  Only public information is available
+  (e.g. Request 'GDP of France', not 'home phone of Michael Jordan')
+"
 }
 
 function main() {
@@ -50,7 +72,7 @@ function main() {
   local base_url="https://api.wolframalpha.com/v2"
   local debug=false
 
-  while getopts "dfhsrvw" OPTNAME; do
+  while getopts "dfhstrvw" OPTNAME; do
     case "$OPTNAME" in
     d)
       debug=true
@@ -64,6 +86,10 @@ function main() {
       ;;
     s)
       mode="spoken"
+      ;;
+    t)
+      tips
+      exit 0
       ;;
     r)
       mode="result"
