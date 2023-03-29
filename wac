@@ -67,8 +67,8 @@ Try the following:
 
 function main() {
 
-  local mode="query"
   local app_id="$WOLFRAM_APP_ID"
+  local mode="query"
   local base_url="https://api.wolframalpha.com/v2"
   local debug=false
 
@@ -139,10 +139,15 @@ def colors:
    };
 
 if .[].success == false then
-        "Wolfram|Alpha did not understand your input",
-        .[].tips.text,
-        "use -t option to get tips on how to use",
-
+        if (.[] | has("error")) and (.[].error | type != "boolean") then
+          "Error:",
+          "  code: " + (.[].error.code | tostring),
+          "  msg:  " + (.[].error.msg | tostring),
+          halt_error(1)
+        else
+          "Wolfram|Alpha did not understand your input",
+          .[].tips.text // "use -t option to get tips on how to use"
+        end,
         if .[] | has("didyoumeans") then
             "inputstring:", "  " + (.[].inputstring | tostring),
             "didyoumeans:", "  " + (.[].didyoumeans[].val | tostring)
@@ -162,8 +167,6 @@ end
 
 ' <<< "$result"
   fi
-
-
 
 }
 

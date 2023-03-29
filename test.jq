@@ -7,9 +7,8 @@ def colors:
 
 if .[].success == false then
         "Wolfram|Alpha did not understand your input",
-        .[].tips.text,
+        .[].tips.text // "tips N/A" ,
         "use -t option to get tips on how to use",
-
         if .[] | has("didyoumeans") then
             "inputstring:", "  " + (.[].inputstring | tostring),
             "didyoumeans:", "  " + (.[].didyoumeans[].val | tostring)
