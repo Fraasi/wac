@@ -1,0 +1,24 @@
+{
+  "queryresult": {
+    "success": false,
+    "error": false,
+    "numpods": 0,
+    "datatypes": "",
+    "timedout": "",
+    "timedoutpods": "",
+    "timing": 0.41500000000000004,
+    "parsetiming": 0.035,
+    "parsetimedout": false,
+    "recalculate": "",
+    "id": "",
+    "parseidserver": "15",
+    "host": "https://www6b3.wolframalpha.com",
+    "server": "15",
+    "related": "",
+    "version": "2.6",
+    "inputstring": "ertyuiui fcghgjk",
+    "tips": {
+      "text": "Check your spelling, and use English"
+    }
+  }
+}
