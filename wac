@@ -4,7 +4,8 @@
 # script for querying wolfram-alpha api from command line
 #
 
-version="1.0.0"
+version="1.1.0"
+update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
 
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
 if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
@@ -38,6 +39,7 @@ Usage:
   -h    show this help
   -s    spoken mode
   -t    show tips on how to use
+  -U    update wac
   -r    result mode
   -v    show version
   -w    query the web interface
@@ -72,7 +74,7 @@ function main() {
   local base_url="https://api.wolframalpha.com/v2"
   local debug=false
 
-  while getopts "dfhstrvw" OPTNAME; do
+  while getopts "dfhstUrvw" OPTNAME; do
     case "$OPTNAME" in
     d)
       debug=true
@@ -90,6 +92,22 @@ function main() {
     t)
       tips
       exit 0
+      ;;
+    U)
+      curl -s "$update_url" -o /tmp/wac
+      local github_version=$(grep -m 1 version /tmp/wac | cut -d'=' -f2 | sed 's/"//g')
+      printf "your current version is %s\nversion on github is %s\n" "$version" "$github_version"
+      read -p "Do you wish to update? [Yn]" yn
+        yn=${yn:-y}
+        case $yn in
+          [Nn]* )
+            exit 0
+            ;;
+          [Yy]* )
+            cp -v /tmp/wac $(which wac)
+            exit 0
+            ;;
+        esac
       ;;
     r)
       mode="result"
@@ -122,8 +140,6 @@ function main() {
   if [[ "$debug" == true ]]; then
     printf "%s" "$result" >result.json
   fi
-
-  # TODO: filter out always empty 'Wikipedia page hits history'
 
   # query == json, all else just text
   if [[ "$mode" != "query" ]]; then
