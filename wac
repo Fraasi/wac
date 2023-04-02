@@ -35,7 +35,7 @@ Usage:
 
   Options:
   -d    debug (with -f, dump json to result.json)
-  -f    full qyery mode (default)
+  -f    full query mode (default)
   -h    show this help
   -s    spoken mode
   -t    show tips on how to use
