@@ -4,7 +4,7 @@
 # script for querying wolfram-alpha api from command line
 #
 
-version="1.1.0"
+version="1.1.1"
 update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
 
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
@@ -162,7 +162,7 @@ if .[].success == false then
           halt_error(1)
         else
           "Wolfram|Alpha did not understand your input",
-          .[].tips.text // "use -t option to get tips on how to use"
+          .[].tips.text // empty
         end,
         if .[] | has("didyoumeans") then
             "inputstring:", "  " + (.[].inputstring | tostring),
@@ -175,7 +175,7 @@ else
                 empty
             else
                 "\(colors.bold)" + .title + ":\(colors.reset)",
-                "  " + .subpods[].plaintext
+                (.subpods[] | if .plaintext != "" then (" " + .plaintext | gsub("\n";"\n ")) else empty end)
             end
             , ""
         )
