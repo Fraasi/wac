@@ -20,12 +20,10 @@ if .[].success == false then
   else empty
   end
 else
-  .[].pods[] | (
-    if .subpods[].plaintext == "" then
-      empty
-    else
-      "\(colors.bold)" + .title + ":\(colors.reset)",
-      (.subpods[] | if .plaintext != "" then (" " + .plaintext | gsub("\n";"\n ")) else empty end), ""
-    end
-  )
+  .[].pods[] |
+  {title: .title, text: [.subpods[].plaintext]} |
+  if .text[0] == "" then empty else . end |
+  (colors.bold + .title + ":" + colors.reset) ,
+  (.text | "  " + join("\n")| gsub("\n";"\n  ")) ,
+  ""
 end

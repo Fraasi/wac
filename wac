@@ -4,7 +4,7 @@
 # Query the wolfram|alpha api from the command line
 #
 
-version="1.1.2"
+version="1.1.3"
 update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
 
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
@@ -169,14 +169,12 @@ if .[].success == false then
   else empty
   end
 else
-  .[].pods[] | (
-    if .subpods[].plaintext == "" then
-      empty
-    else
-      "\(colors.bold)" + .title + ":\(colors.reset)",
-      (.subpods[] | if .plaintext != "" then (" " + .plaintext | gsub("\n";"\n ")) else empty end), ""
-    end
-  )
+  .[].pods[] |
+  {title: .title, text: [.subpods[].plaintext]} |
+  if .text[0] == "" then empty else . end |
+  (colors.bold + .title + ":" + colors.reset) ,
+  (.text | "  " + join("\n")| gsub("\n";"\n  ")) ,
+  ""
 end
 
 ' <<<"$result"
