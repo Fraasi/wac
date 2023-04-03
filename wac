@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck source=/dev/null disable=
 #
-# script for querying wolfram-alpha api from command line
+# Query the wolfram|alpha api from the command line
 #
 
-version="1.1.1"
+version="1.1.2"
 update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
 
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
@@ -47,7 +47,7 @@ Usage:
 }
 
 function tips() {
-    printf "
+  printf "
 Try the following:
   Use different phrasing or notations
   Enter whole words instead of abbreviations
@@ -95,19 +95,19 @@ function main() {
       ;;
     U)
       curl -s "$update_url" -o /tmp/wac
-      local github_version=$(grep -m 1 version /tmp/wac | cut -d'=' -f2 | sed 's/"//g')
+      github_version=$(grep -m 1 version /tmp/wac | cut -d'=' -f2 | sed 's/"//g')
       printf "your current version is %s\nversion on github is %s\n" "$version" "$github_version"
-      read -p "Do you wish to update? [Yn]" yn
-        yn=${yn:-y}
-        case $yn in
-          [Nn]* )
-            exit 0
-            ;;
-          [Yy]* )
-            cp -v /tmp/wac $(which wac)
-            exit 0
-            ;;
-        esac
+      read -r -p "Do you wish to update? [Yn]" yn
+      yn=${yn:-y}
+      case $yn in
+        [Nn]*)
+          exit 0
+          ;;
+        [Yy]*)
+          cp -v /tmp/wac "$(which wac)"
+          exit 0
+          ;;
+      esac
       ;;
     r)
       mode="result"
@@ -148,40 +148,38 @@ function main() {
     jq --raw-output '
 
 def colors:
-    {
-        "underline": "\u001b[4m",
-        "bold": "\u001b[1m",
-        "reset": "\u001b[0m",
-   };
+  {
+    "bold": "\u001b[1m",
+    "reset": "\u001b[0m",
+  };
 
 if .[].success == false then
-        if (.[] | has("error")) and (.[].error | type != "boolean") then
-          "Error:",
-          "  code: " + (.[].error.code | tostring),
-          "  msg:  " + (.[].error.msg | tostring),
-          halt_error(1)
-        else
-          "Wolfram|Alpha did not understand your input",
-          .[].tips.text // empty
-        end,
-        if .[] | has("didyoumeans") then
-            "inputstring:", "  " + (.[].inputstring | tostring),
-            "didyoumeans:", "  " + (.[].didyoumeans[].val | tostring)
-        else empty
-        end
+  if (.[] | has("error")) and (.[].error | type != "boolean") then
+    "Error:",
+    "  code: " + (.[].error.code | tostring),
+    "  msg:  " + (.[].error.msg | tostring),
+    halt_error(1)
+  else
+    "Wolfram|Alpha did not understand your input",
+    .[].tips.text // empty
+  end,
+  if .[] | has("didyoumeans") then
+    "inputstring:", "  " + (.[].inputstring | tostring),
+    "didyoumeans:", "  " + (.[].didyoumeans[].val | tostring)
+  else empty
+  end
 else
-    .[].pods[] | (
-            if .subpods[].plaintext == "" then
-                empty
-            else
-                "\(colors.bold)" + .title + ":\(colors.reset)",
-                (.subpods[] | if .plaintext != "" then (" " + .plaintext | gsub("\n";"\n ")) else empty end)
-            end
-            , ""
-        )
+  .[].pods[] | (
+    if .subpods[].plaintext == "" then
+      empty
+    else
+      "\(colors.bold)" + .title + ":\(colors.reset)",
+      (.subpods[] | if .plaintext != "" then (" " + .plaintext | gsub("\n";"\n ")) else empty end), ""
+    end
+  )
 end
 
-' <<< "$result"
+' <<<"$result"
   fi
 
 }

@@ -1,8 +1,7 @@
 ## wac - wolfram|alpha cli
-Query the Wolfram|alpha api from the command line.
+Query the wolfram|alpha api from the command line.
 
-> note: this is just an early working version. Needs more usage to find the bugs and see what could be done better.
-If you're unfamiliar with wolfram|alpha, you can read more about it & also try it on their [website](https://www.wolframalpha.com)
+> If you're unfamiliar with wolfram|alpha, you can read more about it and try it on their [website](https://www.wolframalpha.com)
 
 ### dependencies
 * curl - for fething data
@@ -33,6 +32,8 @@ Usage:
   -f    full query mode (default)
   -h    show this help
   -s    spoken mode
+  -t    show tips on how to use
+  -U    update wac
   -r    result mode
   -v    show version
   -w    query the web interface
