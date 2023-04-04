@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# shellcheck source=/dev/null disable=
+#
+# © fraasi (https://github.com/fraasi)
 #
 # Query the wolfram|alpha api from the command line
 #
+# shellcheck source=/dev/null disable=
 
-version="1.1.4"
-update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
+version="1.1.5"
 
-# if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable
+# if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable (w|a throws err if no app_id)
 if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
   source "$HOME"/.config/wac/config
 fi
@@ -97,8 +98,10 @@ function main() {
       exit 0
       ;;
     U)
-      curl -s "$update_url" -o "$(dirname "$(mktemp -u)")/wac"
-      github_version=$(grep -m 1 version /tmp/wac | cut -d'=' -f2 | sed 's/"//g')
+      update_url="https://raw.githubusercontent.com/Fraasi/wac/main/wac"
+      temp_file="$(dirname "$(mktemp -u)")/wac"
+      curl -s "$update_url" -o "$temp_file"
+      github_version=$(grep -m 1 version "$temp_file" | cut -d'=' -f2 | sed 's/"//g')
       printf "your current version is %s\nversion on github is %s\n" "$version" "$github_version"
       read -r -p "Do you wish to update? [Yn]" yn
       yn=${yn:-y}
