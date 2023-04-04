@@ -6,7 +6,7 @@
 #
 # shellcheck source=/dev/null disable=
 
-version="1.1.5"
+version="1.1.6"
 
 # if WOLFRAM_APP_ID is empty & ~/.config/wac/config is readable (w|a throws err if no app_id)
 if [[ -z "$WOLFRAM_APP_ID" && -r "$HOME"/.config/wac/config ]]; then
@@ -110,7 +110,7 @@ function main() {
           exit 0
           ;;
         [Yy]*)
-          cp -v /tmp/wac "$(which wac)"
+          cp -v "$temp_file" "$(which wac)"
           exit 0
           ;;
       esac
