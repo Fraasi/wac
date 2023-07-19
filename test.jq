@@ -24,6 +24,8 @@ else
   {title: .title, text: [.subpods[].plaintext]} |
   if .text[0] == "" then empty else . end |
   (colors.bold + .title + ":" + colors.reset) ,
-  (.text | "  " + join("\n")| gsub("\n";"\n  ")) ,
-  ""
+  # pretty print this
+  # .text
+   ( .text | "  " + join("\n") | gsub("\n"; "\n  ") | .), ""
+#   // jq -r '  .text | split("\n") | . as $array | [.[] | length] | max as $maxlength | $array[] | .' test.json
 end
